@@ -1,7 +1,6 @@
 package dao;
 
 import entity.OrderDetail;
-import entity.Product;
 import util.DBConnection;
 
 import java.sql.*;
@@ -12,7 +11,7 @@ public class OrderDetailDAO {
     private Connection conn = DBConnection.getInstance().getConnection();
     public List<OrderDetail> getAllOrderDetail() {
         List<OrderDetail> list =new ArrayList<>();
-        String sql="select * from product";
+        String sql="select * from order_details";
         try(Statement st=conn.createStatement();
             ResultSet rs=st.executeQuery(sql)){
             while (rs.next()){
@@ -34,7 +33,7 @@ public class OrderDetailDAO {
     }
 
     public void addOrderDetail(OrderDetail od) {
-        String sql = "INSERT INTO order_details(order_id, product_id, quantity, price) VALUES (?,?,?,?)";
+        String sql = "insert into order_details(order_id, product_id, quantity, price) values (?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, od.getOrderId());
             ps.setInt(2, od.getProductId());
@@ -46,12 +45,26 @@ public class OrderDetailDAO {
         }
     }
     public void deleteOrderDetail(int id) {
-        String sql = "DELETE FROM order_details WHERE id=?";
+        String sql = "delete from order_details where id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    public List<OrderDetail> getDetailsByOrderId(int orderId) {
+        List<OrderDetail> list = new ArrayList<>();
+        String sql = "SELECT * FROM order_details WHERE order_id=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapResultSetToOrderDetail(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

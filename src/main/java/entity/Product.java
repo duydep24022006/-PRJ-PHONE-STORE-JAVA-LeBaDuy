@@ -9,6 +9,15 @@ public class Product {
     private double price;
     private int stock;
     private String description;
+    private int categoryId;
+
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
 
     public Product() {
     }
