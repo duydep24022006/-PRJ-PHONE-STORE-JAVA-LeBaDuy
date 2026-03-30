@@ -150,9 +150,6 @@ public class ProductDAO {
         }
         return list;
     }
-    public List<Product> getFlashSaleProducts() {
-        String sql = "SELECT * FROM product WHERE flash_sale_price IS NOT NULL AND flash_sale_expiry > NOW()";
-        // thực hiện query và trả về danh sách Product
-    }
+
 
 }

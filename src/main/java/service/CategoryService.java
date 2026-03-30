@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CategoryService {
-
     private CategoryDAO categoryDAO=new CategoryDAO();
     Scanner sc=new Scanner(System.in);
-    private CategoryService categoryService=new CategoryService();
     public void addCategory() {
         System.out.println("=== Them moi danh muc ===");
         System.out.print("Ten danh muc: ");

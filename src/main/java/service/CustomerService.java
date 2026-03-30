@@ -216,8 +216,8 @@ public class CustomerService {
             }
         }
     }
-    public void viewFlashSaleProducts() {
-        List<Product> products = productDAO.getFlashSaleProducts();
-        displayProducts(products);
-    }
+//    public void viewFlashSaleProducts() {
+//        List<Product> products = productDAO.getFlashSaleProducts();
+//        displayProducts(products);
+//    }
 }
