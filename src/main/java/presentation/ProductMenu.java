@@ -15,9 +15,7 @@ public class ProductMenu {
             System.out.println("5. Tim kiem san pham theo ten");
             System.out.println("0. Thoat");
             System.out.print("Chon: ");
-            int choice = sc.nextInt();
-            sc.nextLine();
-
+            int choice = productService.validateInt();
             switch (choice) {
                 case 1 -> productService.addProduct();
                 case 2 -> productService.updateProduct();

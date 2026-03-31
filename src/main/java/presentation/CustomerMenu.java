@@ -25,7 +25,12 @@ public class CustomerMenu {
             System.out.println("5. Cap nhat thong tin ca nhan");
             System.out.println("6. Loc san pham theo hang");
             System.out.println("7. Loc san pham theo gia");
-            System.out.println("8. danh sanh 5 san pham ban chay nhat thang");
+            System.out.println("8. Danh sach 5 san pham ban chay nhat thang");
+            System.out.println("9. Them vao gio hang");
+            System.out.println("10. Xem gio hang");
+            System.out.println("11. Xoa san pham trong gio hang");
+            System.out.println("12. Xoa toan bo gio hang");
+            System.out.println("13. Dat hàng trong gio hang");
             System.out.println("0. Thoat");
             System.out.print("Chon: ");
             choice = customerService.validateInt();
@@ -39,11 +44,17 @@ public class CustomerMenu {
                 case 6 -> customerService.fillterByBrand();
                 case 7 -> customerService.filterByPrice();
                 case 8 -> customerService.topProducts();
+                case 9 -> customerService.addToCart();
+                case 10 -> customerService.showCart();
+                case 11 -> customerService.removeFromCart();
+                case 12 -> customerService.clearCart();
+                case 13 -> customerService.checkoutCart();
                 case 0 -> System.out.println("Thoat menu khach hang.");
                 default -> System.out.println("Lua chon khong hop le!");
             }
         } while (choice != 0);
     }
+
 
 
 

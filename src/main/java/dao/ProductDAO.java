@@ -75,13 +75,14 @@ public class ProductDAO {
             ps.setInt(6, p.getStock());
             ps.setString(7, p.getDescription());
             ps.executeUpdate();
+            System.out.println("Them san pham thanh cong!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void updateProduct(Product p) {
-        String sql = "update product set name=?,brand=?,capacity=?,color=?,price=?,stock=? where id=?";
+        String sql = "UPDATE product SET name=?, brand=?, capacity=?, color=?, price=?, stock=?, description=?, category_id=? WHERE id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getName());
             ps.setString(2, p.getBrand());
@@ -90,7 +91,10 @@ public class ProductDAO {
             ps.setDouble(5, p.getPrice());
             ps.setInt(6, p.getStock());
             ps.setString(7, p.getDescription());
+            ps.setInt(8, p.getCategoryId());
+            ps.setInt(9, p.getId());
             ps.executeUpdate();
+            System.out.println("Cap nhat san pham thanh cong!");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,6 +105,7 @@ public class ProductDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
+            System.out.println("Xoa san pham thanh cong!");
         } catch (SQLException e) {
             if (e.getSQLState().equals("23000")) { // 23000 là SQLState cho lỗi ràng buộc
                 System.out.println("San pham nay dang duoc su dung trong cac don hang hoac lien ket khac, nen khong the xoa.");

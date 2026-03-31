@@ -43,6 +43,7 @@ public class CategoryService {
         categoryDAO.deleteCategory(id);
         System.out.println("Xoa danh muc thanh cong!");
     }
+
     public void updateCategory() {
         System.out.println("=== Cap nhat danh muc ===");
         System.out.print("Nhap ID danh muc can cap nhat: ");
@@ -90,5 +91,16 @@ public class CategoryService {
 
         categoryDAO.updateCategory(c);
         System.out.println("Cap nhat danh muc thanh cong!");
+    }
+    public int validateInt() {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            try {
+                String input = sc.nextLine().trim();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.print("Nhap sai, vui long nhap so nguyen: ");
+            }
+        }
     }
 }

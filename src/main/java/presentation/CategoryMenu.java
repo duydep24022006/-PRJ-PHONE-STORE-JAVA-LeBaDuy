@@ -16,8 +16,7 @@ public class CategoryMenu {
             System.out.println("4. Cap nhat danh muc");
             System.out.println("0. Thoat");
             System.out.print("Chon: ");
-            int choice = sc.nextInt();
-            sc.nextLine();
+            int choice = categoryService.validateInt();
             switch (choice) {
                 case 1 -> categoryService.addCategory();
                 case 2 -> categoryService.showCategories();

@@ -1,5 +1,6 @@
 package util;
 
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Validator {
@@ -44,4 +45,5 @@ public class Validator {
 
         return sb.toString();
     }
+
 }

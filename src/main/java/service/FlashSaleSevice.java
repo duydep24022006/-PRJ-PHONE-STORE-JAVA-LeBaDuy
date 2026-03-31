@@ -74,6 +74,16 @@ public class FlashSaleSevice {
             }
         }
     }
-
+    public int validateInt() {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            try {
+                String input = sc.nextLine().trim();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.print("Nhap sai, vui long nhap so nguyen: ");
+            }
+        }
+    }
 
 }

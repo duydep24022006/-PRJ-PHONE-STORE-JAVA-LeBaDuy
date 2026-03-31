@@ -1,13 +1,14 @@
 package service;
 
+import dao.CartDAO;
 import dao.CustomerDAO;
 import dao.OrderDAO;
 import dao.ProductDAO;
-import model.Customer;
-import model.Orders;
-import model.Product;
+import model.*;
 import util.Validator;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
@@ -18,40 +19,33 @@ public class CustomerService {
     private ProductDAO productDAO = new ProductDAO();
     private OrderDAO orderDAO = new OrderDAO();
     private ReportService reportService = new ReportService();
+    private CartDAO cartDAO = new CartDAO();
+    private Integer currentCartId = null;
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
     public void viewProducts() {
         List<Product> products = productDAO.getAllProducts();
-        System.out.printf("%-5s %-25s %-15s %-12s %-15s %-15s %-10s %-10s\n",
-                "ID", "Ten san pham", "Hang", "Dung luong", "Gia goc (VND)", "Gia Flash Sale", "Giam (%)", "Ton kho");
+        System.out.printf("%-5s %-25s %-15s %-12s %-15s %-15s %-10s\n",
+                "ID", "Ten san pham", "Hang", "Dung luong", "Gia goc (VND)", "Gia Flash Sale", "Ton kho");
         System.out.println("-----------------------------------------------------------------------------------------------------------");
 
         for (Product p : products) {
-            // Mặc định không có flash sale
             String flashSaleDisplay = "-";
-            String discountPercentDisplay = "-";
 
-            // Nếu có flash sale hợp lệ (còn số lượng, chưa hết hạn)
             if (p.getFlashSalePrice() != null && p.getFlashSalePrice() > 0
                     && p.getFlashSaleQuantity() > 0 && p.getFlashSaleExpiry() != null
                     && p.getFlashSaleExpiry().isAfter(LocalDateTime.now())) {
 
                 flashSaleDisplay = Validator.formatMoney(p.getFlashSalePrice());
-
-                // Tính phần trăm giảm giá
-                double discountPercent = ((p.getPrice() - p.getFlashSalePrice()) / p.getPrice()) * 100;
-                discountPercentDisplay = String.format("%.0f%%", discountPercent);
             }
-
-            System.out.printf("%-5d %-25s %-15s %-12s %-15s %-15s %-10s %-10d\n",
+            System.out.printf("%-5d %-25s %-15s %-12s %-15s %-15s  %-10d\n",
                     p.getId(),
                     p.getName(),
                     p.getBrand(),
                     p.getCapacity(),
                     Validator.formatMoney(p.getPrice()),
                     flashSaleDisplay,
-                    discountPercentDisplay,
                     p.getStock());
         }
     }
@@ -181,7 +175,7 @@ public class CustomerService {
     public void viewOrders() {
         System.out.println("=== Lich su don hang ===");
         List<Orders> orders = orderDAO.getOrdersByCustomer(customer.getId());
-
+        orders.sort((o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()));
         if (orders.isEmpty()) {
             System.out.println("Ban chua co don hang nao!");
             return;
@@ -207,7 +201,6 @@ public class CustomerService {
         }
     }
 
-
     public void displayProducts(List<Product> products) {
         System.out.printf("%-5s %-25s %-15s %-12s %-12s %-10s\n",
                 "ID", "Ten san pham", "Hang", "Dung luong", "Gia (VND)", "Ton kho");
@@ -223,7 +216,7 @@ public class CustomerService {
         List<Product> products = productDAO
                 .searchByBrand(brand);
         if(products.isEmpty()) {
-            System.out.println("Khong tim thay san pham");
+            System.out.println("Khong tim thay hang");
             return;
         }
         displayProducts(products);
@@ -264,6 +257,157 @@ public class CustomerService {
     }
     public void topProducts(){
         reportService.reportTop5();
+    }
+    public void addToCart(){
+        try {
+            System.out.print("Nhap ID san pham muon mua: ");
+            int id = validateInt();
+
+            Product p = productDAO.getById(id);
+            if (p == null) {
+                System.out.println("San pham khong ton tai.");
+                return;
+            }
+            int quantity ;
+            while (true) {
+                System.out.print("Nhap so luong: ");
+                    quantity = validateInt();
+
+                if (quantity <= 0) {
+                    System.out.println("So luong phai lon hon 0.");
+                    continue;
+                }
+
+                if (quantity > p.getStock()) {
+                    System.out.println("So luong vuot qua so luong san pham trong kho.");
+                    continue;
+                }
+
+                break;
+            }
+            if (currentCartId == null) {
+                currentCartId = cartDAO.createCart(customer.getId());
+            }
+            cartDAO.addItem(currentCartId, p.getId(), quantity);
+        } catch (Exception e) {
+            System.out.println("Co loi xay ra khi them vao gio hang: " + e.getMessage());
+        }
+    }
+    public void showCart() {
+        try {
+            if (currentCartId == null) {
+                System.out.println("Gio hang dang trong.");
+                return;
+            }
+            List<CartItem> items = cartDAO.getItems(currentCartId);
+            if (items.isEmpty()) {
+                System.out.println("Gio hang dang trong.");
+                return;
+            }
+
+            System.out.println("=== Danh sach gio hang ===");
+            System.out.printf("%-5s %-20s %-10s %-15s %-15s%n",
+                    "ID", "Ten san pham", "So luong", "Gia (VND)", "Tong tien");
+            System.out.println("--------------------------------------------------------------------------");
+
+            double grandTotal = 0;
+            for (CartItem item : items) {
+                Product p = item.getProduct();
+                double lineTotal = p.getPrice() * item.getQuantity();
+                grandTotal += lineTotal;
+
+                System.out.printf("%-5d %-20s %-10d %-15.2f %-15.2f%n",
+                        p.getId(),
+                        p.getName(),
+                        item.getQuantity(),
+                        p.getPrice(),
+                        lineTotal);
+            }
+
+            System.out.println("--------------------------------------------------------------------------");
+            System.out.printf("%-5s %-20s %-10s %-15s %-15.2f%n",
+                    "", "", "", "Tong cong:", grandTotal);
+        } catch (SQLException e) {
+            System.out.println("Co loi khi hien thi gio hang: " + e.getMessage());
+        }
+    }
+    public void removeFromCart() {
+        System.out.print("Nhap ID san pham muon xoa: ");
+        int productId = validateInt();
+        try {
+            if (currentCartId == null) {
+                System.out.println("Ban chua co gio hang.");
+                return;
+            }
+            cartDAO.removeItem(currentCartId, productId);
+
+            List<CartItem> items = cartDAO.getItems(currentCartId);
+            if (items.isEmpty()) {
+                currentCartId = null;
+                System.out.println("Gio hang da trong sau khi xoa.");
+            } else {
+                System.out.println("Da xoa san pham co ID " + productId + " khoi gio hang.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Co loi khi xoa san pham: " + e.getMessage());
+        }
+    }
+
+    public void clearCart() {
+        try {
+            if (currentCartId == null) {
+                System.out.println("Ban chua co gio hang.");
+                return;
+            }
+            cartDAO.clearCart(currentCartId);
+            currentCartId = null;
+            System.out.println("Da xoa toan bo gio hang.");
+        } catch (SQLException e) {
+            System.out.println("Co loi khi xoa gio hang: " + e.getMessage());
+        }
+    }
+
+    public void checkoutCart() {
+        try {
+            if (currentCartId == null) {
+                System.out.println("Ban chua co gio hang.");
+                return;
+            }
+
+            List<CartItem> items = cartDAO.getItems(currentCartId);
+            if (items.isEmpty()) {
+                System.out.println("Gio hang dang trong.");
+                return;
+            }
+
+            // Tạo đơn hàng
+            int orderId = orderDAO.createOrder(customer.getId());
+
+            // Thêm từng sản phẩm vào order_items
+            for (CartItem item : items) {
+                Product p = item.getProduct();
+                orderDAO.addOrderItem(orderId, p.getId(), item.getQuantity(), p.getPrice());
+            }
+
+            // Hỏi mã giảm giá
+            System.out.print("Ban co ma giam gia khong? (Nhap code hoac Enter bo qua): ");
+            String code = sc.nextLine().trim();
+            if (!code.isEmpty()) {
+                double finalAmount = orderDAO.applyCoupon(orderId, code);
+                if (finalAmount > 0) {
+                    System.out.println("Tong tien sau giam: " + Validator.formatMoney(finalAmount) + " VND");
+                }
+            }
+
+            System.out.println("Dat hang tu gio hang thanh cong!");
+
+
+            cartDAO.clearCart(currentCartId);
+            currentCartId = null;
+
+        } catch (SQLException e) {
+            System.out.println("Co loi khi dat hang tu gio hang: " + e.getMessage());
+        }
     }
 
 }

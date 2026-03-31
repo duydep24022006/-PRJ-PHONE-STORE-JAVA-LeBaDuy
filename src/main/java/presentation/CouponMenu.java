@@ -14,8 +14,7 @@ public class CouponMenu {
             System.out.println("3. Xoa ma giam gia");
             System.out.println("0. Quay lai");
             System.out.print("Chon: ");
-            int choice = sc.nextInt();
-            sc.nextLine();
+            int choice = couponService.validateInt();
             switch (choice) {
                 case 1 -> couponService.addCoupon();
                 case 2 -> couponService.viewCoupons();

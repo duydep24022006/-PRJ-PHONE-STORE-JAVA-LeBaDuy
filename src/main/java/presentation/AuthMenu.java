@@ -13,8 +13,7 @@ public class AuthMenu {
             System.out.println("2. Dang nhap");
             System.out.println("0. Thoat");
             System.out.print("Chon: ");
-            int choice = sc.nextInt();
-            sc.nextLine();
+            int choice = authService.validateInt();
 
             switch (choice) {
                 case 1 -> authService.register();

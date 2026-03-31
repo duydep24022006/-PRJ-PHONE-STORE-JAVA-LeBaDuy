@@ -3,6 +3,7 @@ package presentation;
 
 import model.Customer;
 import service.ReportService;
+import util.Validator;
 
 import java.util.Scanner;
 
@@ -24,8 +25,7 @@ public class AdminMenu {
             System.out.println("6. danh sanh 5 san pham ban chay nhat thang");
             System.out.println("0. Thoat");
             System.out.print("Chon: ");
-            int choice = sc.nextInt();
-            sc.nextLine();
+            int choice = validateInt();
             switch (choice) {
                 case 1 -> new CategoryMenu().showMenu();
                 case 2 -> new ProductMenu().showMenu();
@@ -35,6 +35,17 @@ public class AdminMenu {
                 case 6 -> new ReportService().reportTop5();
                 case 0 -> { return; }
                 default -> System.out.println("Lua chon khong hop le!");
+            }
+        }
+    }
+    private int validateInt() {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            try {
+                String input = sc.nextLine().trim();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.print("Nhap sai, vui long nhap so nguyen: ");
             }
         }
     }

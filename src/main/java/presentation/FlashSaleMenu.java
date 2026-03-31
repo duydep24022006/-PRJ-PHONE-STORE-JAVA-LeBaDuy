@@ -17,8 +17,7 @@ public class FlashSaleMenu {
             System.out.println("3. Xem danh sach san pham co flash sale");
             System.out.println("0. Quay lai");
             System.out.print("Chon: ");
-            int choice = sc.nextInt();
-            sc.nextLine();
+            int choice = flashSaleSevice.validateInt();
             switch (choice) {
                 case 1 -> flashSaleSevice.createFlashSale();
                 case 2 -> flashSaleSevice.removeFlashSale();

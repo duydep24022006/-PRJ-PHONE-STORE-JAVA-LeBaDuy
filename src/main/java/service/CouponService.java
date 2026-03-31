@@ -16,7 +16,7 @@ public class CouponService {
         String code = sc.nextLine();
         System.out.print("Nhap % giam gia: ");
         int discountPercent = sc.nextInt();
-        sc.nextLine(); // clear buffer
+        sc.nextLine();
         System.out.print("Nhap ngay het han (yyyy-MM-dd HH:mm:ss): ");
         String expiryStr = sc.nextLine();
         Timestamp expiryDate = Timestamp.valueOf(expiryStr);
@@ -54,5 +54,16 @@ public class CouponService {
         sc.nextLine();
         couponDAO.deleteCoupon(id);
         System.out.println("Xoa giam gia thanh cong!");
+    }
+    public int validateInt() {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            try {
+                String input = sc.nextLine().trim();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.print("Nhap sai, vui long nhap so nguyen: ");
+            }
+        }
     }
 }

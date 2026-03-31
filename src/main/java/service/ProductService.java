@@ -7,9 +7,7 @@ import model.Product;
 import util.Validator;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 
 public class ProductService {
@@ -61,7 +59,7 @@ public class ProductService {
         p.setDescription(description);
         p.setCategoryId(categoryId);
         productDAO.addProduct(p);
-        System.out.println("Them san pham thanh cong!");
+
     }
     public void updateProduct() {
         System.out.println("=== Sua thong tin san pham ===");
@@ -137,7 +135,7 @@ public class ProductService {
         p.setCategoryId(categoryId);
 
         productDAO.updateProduct(p);
-        System.out.println("Cap nhat san pham thanh cong!");
+
     }
     public void deleteProduct() {
         System.out.println("=== Xoa san pham ===");
@@ -155,7 +153,6 @@ public class ProductService {
         String choice = sc.nextLine();
         if (choice.equalsIgnoreCase("Y")) {
             productDAO.deleteProduct(id);
-            System.out.println("Xoa san pham thanh cong!");
         } else {
             System.out.println("Huy thao tac xoa.");
         }
@@ -210,5 +207,15 @@ public class ProductService {
                     p.getCategoryId());
         }
     }
-
+    public int validateInt() {
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            try {
+                String input = sc.nextLine().trim();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.print("Nhap sai, vui long nhap so nguyen: ");
+            }
+        }
+    }
 }

@@ -26,6 +26,7 @@ public class OrderService {
             System.out.println("Khong co don hang nao!");
             return;
         }
+        orders.sort((o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()));
         System.out.printf("%-5s %-20s %-25s %-20s %-10s %-15s %-15s %-12s %-20s\n",
                 "ID", "Khach hang", "Email", "San pham", "So luong", "Gia (VND)", "Thanh tien (VND)", "Trang thai", "Ngay tao");
         System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------");

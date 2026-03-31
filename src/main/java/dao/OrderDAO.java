@@ -5,7 +5,6 @@ import util.DBConnection;
 import java.sql.SQLException;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class OrderDAO {
@@ -242,8 +241,8 @@ public class OrderDAO {
                 o.setPrice(rs.getDouble("price"));
                 o.setStatus(rs.getString("status"));
                 o.setCreatedAt(rs.getTimestamp("created_at"));
-                o.setCouponCode(rs.getString("coupon_code")); // có thể null
-                o.setDiscountPercent(rs.getInt("discount_percent")); // có thể 0 nếu không có mã
+                o.setCouponCode(rs.getString("coupon_code"));
+                o.setDiscountPercent(rs.getInt("discount_percent"));
                 o.setFinalTotal(rs.getDouble("final_total"));
                 list.add(o);
             }
@@ -304,7 +303,7 @@ public class OrderDAO {
             e.printStackTrace();
         }
 
-        System.out.println("Áp dụng mã " + code + " giảm " + discountPercent + "% thành công!");
+        System.out.println("ap dung ma " + code + " giam " + discountPercent + "% thanh cong!");
         return finalAmount;
     }
     public void reportTop5ProductsThisMonth() {
@@ -320,7 +319,7 @@ public class OrderDAO {
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             System.out.println("=== Top 5 san pham ban chay nhat thang ===");
-            System.out.printf("%-25s %-15s\n", "San pham", "Số luong ban");
+            System.out.printf("%-25s %-15s\n", "San pham", "So luong ban");
             System.out.println("------------------------------------------");
             while (rs.next()) {
                 String name = rs.getString("product_name");
@@ -331,6 +330,36 @@ public class OrderDAO {
             e.printStackTrace();
         }
     }
+    public int createOrder(int customerId) throws SQLException {
+        String insertOrderSQL = "INSERT INTO orders(customer_id, status) VALUES(?,'pending')";
+        int orderId = -1;
+        try (PreparedStatement ps = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, customerId);
+            ps.executeUpdate();
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                orderId = rs.getInt(1);
+            }
+        }
+        return orderId;
+    }
+    public void addOrderItem(int orderId, int productId, int quantity, double price) throws SQLException {
+        String insertDetailSQL = "INSERT INTO order_details(order_id, product_id, quantity, price) VALUES (?,?,?,?)";
+        try (PreparedStatement ps = conn.prepareStatement(insertDetailSQL)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, productId);
+            ps.setInt(3, quantity);
+            ps.setDouble(4, price);
+            ps.executeUpdate();
+        }
 
+        // Giảm stock
+        String updateStockSQL = "UPDATE product SET stock = stock - ? WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(updateStockSQL)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.executeUpdate();
+        }
+    }
 
 }
