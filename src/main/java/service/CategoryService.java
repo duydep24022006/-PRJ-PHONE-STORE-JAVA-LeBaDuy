@@ -1,7 +1,7 @@
 package service;
 
 import dao.CategoryDAO;
-import entity.Category;
+import model.Category;
 
 import java.util.List;
 import java.util.Scanner;

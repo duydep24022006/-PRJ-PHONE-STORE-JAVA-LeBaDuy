@@ -1,6 +1,6 @@
 package dao;
 
-import entity.Customer;
+import model.Customer;
 import util.DBConnection;
 
 import java.sql.*;
@@ -9,7 +9,14 @@ import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class CustomerDAO {
-    private Connection conn = DBConnection.getInstance().getConnection();
+    private Connection conn ;
+    public CustomerDAO() {
+        try {
+            conn = DBConnection.getInstance().getConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private Customer mapResultSetToCustomer(ResultSet rs) throws SQLException {
         Customer c = new Customer();

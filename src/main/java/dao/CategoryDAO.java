@@ -1,12 +1,19 @@
 package dao;
 
-import entity.Category;
+import model.Category;
 import util.DBConnection;
 import java.sql.*;
 import java.util.*;
 
 public class CategoryDAO {
-    private Connection conn = DBConnection.getInstance().getConnection();
+    private Connection conn ;
+    public CategoryDAO() {
+        try {
+            conn = DBConnection.getInstance().getConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private Category mapResultSet(ResultSet rs) throws SQLException {
         Category c = new Category();

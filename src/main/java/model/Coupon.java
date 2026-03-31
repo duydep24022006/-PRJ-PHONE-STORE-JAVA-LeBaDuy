@@ -1,19 +1,19 @@
-package entity;
+package model;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Coupon {
     private int id;
     private String code;
     private int discountPercent;
-    private Date expiryDate;
+    private Timestamp expiryDate;
     private int usageLimit;
     private int usedCount;
 
     // Constructor
     public Coupon() {}
 
-    public Coupon(int id, String code, int discountPercent, Date expiryDate, int usageLimit, int usedCount) {
+    public Coupon(int id, String code, int discountPercent, Timestamp expiryDate, int usageLimit, int usedCount) {
         this.id = id;
         this.code = code;
         this.discountPercent = discountPercent;
@@ -32,8 +32,8 @@ public class Coupon {
     public int getDiscountPercent() { return discountPercent; }
     public void setDiscountPercent(int discountPercent) { this.discountPercent = discountPercent; }
 
-    public Date getExpiryDate() { return expiryDate; }
-    public void setExpiryDate(Date expiryDate) { this.expiryDate = expiryDate; }
+    public Timestamp getExpiryDate() { return expiryDate; }
+    public void setExpiryDate(Timestamp expiryDate) { this.expiryDate = expiryDate; }
 
     public int getUsageLimit() { return usageLimit; }
     public void setUsageLimit(int usageLimit) { this.usageLimit = usageLimit; }

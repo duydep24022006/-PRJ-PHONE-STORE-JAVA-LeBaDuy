@@ -1,6 +1,6 @@
 package dao;
 
-import entity.OrderDetail;
+import model.OrderDetail;
 import util.DBConnection;
 
 import java.sql.*;
@@ -8,7 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDetailDAO {
-    private Connection conn = DBConnection.getInstance().getConnection();
+    private Connection conn ;
+    public OrderDetailDAO() {
+        try {
+            conn = DBConnection.getInstance().getConnection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public List<OrderDetail> getAllOrderDetail() {
         List<OrderDetail> list =new ArrayList<>();
         String sql="select * from order_details";
@@ -55,12 +62,22 @@ public class OrderDetailDAO {
     }
     public List<OrderDetail> getDetailsByOrderId(int orderId) {
         List<OrderDetail> list = new ArrayList<>();
-        String sql = "SELECT * FROM order_details WHERE order_id=?";
+        String sql = "SELECT od.id, od.order_id, od.product_id, od.quantity, od.price, p.name AS product_name " +
+                    "FROM order_details od " +
+                    "JOIN product p ON od.product_id = p.id " +
+                    "WHERE od.order_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                list.add(mapResultSetToOrderDetail(rs));
+                OrderDetail od = new OrderDetail();
+                od.setId(rs.getInt("id"));
+                od.setOrderId(rs.getInt("order_id"));
+                od.setProductId(rs.getInt("product_id"));
+                od.setQuantity(rs.getInt("quantity"));
+                od.setPrice(rs.getDouble("price"));
+                od.setProductName(rs.getString("product_name")); // thêm tên sản phẩm
+                list.add(od);
             }
         } catch (SQLException e) {
             e.printStackTrace();

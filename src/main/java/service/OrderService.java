@@ -2,9 +2,9 @@ package service;
 
 import dao.OrderDAO;
 import dao.ProductDAO;
-import entity.Customer;
-import entity.Orders;
-import entity.Product;
+import model.Customer;
+import model.Orders;
+import util.Validator;
 
 import java.util.List;
 import java.util.Scanner;
@@ -15,21 +15,10 @@ public class OrderService {
     private ProductDAO productDAO = new ProductDAO();
     private OrderDAO orderDAO = new OrderDAO();
 
-    // Cho phép set customer từ bên ngoài
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
 
-    // Admin cập nhật trạng thái đơn hàng
-    public void updateOrderStatus(int orderId, String newStatus) {
-        List<String> validStatuses = List.of("pending", "approved", "shipping", "cancelled");
-        if (!validStatuses.contains(newStatus.toLowerCase())) {
-            System.out.println("Trang thai khong hop le!");
-            return;
-        }
-        orderDAO.updateOrder(orderId, newStatus);
-        System.out.println("Cap nhat trang thai don hang thanh cong!");
-    }
 
     public void viewAllOrders() {
         List<Orders> orders = getAllOrders();
@@ -37,24 +26,69 @@ public class OrderService {
             System.out.println("Khong co don hang nao!");
             return;
         }
-        System.out.printf("%-5s %-12s %-15s %-20s\n",
-                "ID", "Khach hang", "Trang thai", "Ngay tao");
-        System.out.println("-------------------------------------------------------------");
+        System.out.printf("%-5s %-20s %-25s %-20s %-10s %-15s %-15s %-12s %-20s\n",
+                "ID", "Khach hang", "Email", "San pham", "So luong", "Gia (VND)", "Thanh tien (VND)", "Trang thai", "Ngay tao");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------------------------");
+
         for (Orders o : orders) {
-            System.out.printf("%-5d %-12d %-15s %-20s\n",
+            double lineTotal = o.getQuantity() * o.getPrice();
+            System.out.printf("%-5d %-20s %-25s %-20s %-10d %-15s %-15s %-12s %-20s\n",
                     o.getId(),
-                    o.getCustomer_id(),
+                    o.getCustomerName(),
+                    o.getCustomerEmail(),
+                    o.getProductName(),
+                    o.getQuantity(),
+                    Validator.formatMoney(o.getPrice()),
+                    Validator.formatMoney(lineTotal),
                     o.getStatus(),
                     o.getCreatedAt());
         }
+        System.out.println("----------------------------------------------------------------------------------------------------------------------------------------------------");
     }
 
     public void updateOrderStatus() {
+
         System.out.print("Nhap ID don hang can cap nhat: ");
         int orderId = validateInt();
-        System.out.print("Nhap trang thai moi (pending/approved/shipping/cancelled): ");
-        String status = sc.nextLine();
-        updateOrderStatus(orderId, status);
+
+        Orders order = orderDAO.getOrderById(orderId);
+        if (order == null) {
+            System.out.println("Khong tim thay don hang!");
+            return;
+        }
+
+        String currentStatus = order.getStatus().toLowerCase();
+        System.out.println("Trang thai hien tai: " + currentStatus);
+        System.out.print("Nhap trang thai moi (shipping/delivered/cancelled): ");
+        String newStatus = sc.nextLine().trim().toLowerCase();
+
+        boolean validTransition = false;
+        switch (currentStatus) {
+            case "pending":
+                if (newStatus.equals("shipping")) {
+                    validTransition = true;
+                } else if (newStatus.equals("cancelled")) {
+                    validTransition = true;
+                    orderDAO.cancelOrder(orderId);
+                    return;
+                }
+                break;
+            case "shipping":
+                validTransition = newStatus.equals("delivered");
+                break;
+            case "delivered":
+            case "cancelled":
+                validTransition = false;
+                break;
+        }
+
+        if (!validTransition) {
+            System.out.println("Chuyen trang thai khong hop le!");
+            return;
+        }
+
+        orderDAO.updateOrder(orderId, newStatus);
+        System.out.println("Cap nhat trang thai thanh cong!");
     }
     // Admin xem toàn bộ đơn hàng
     public List<Orders> getAllOrders() {

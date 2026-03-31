@@ -1,10 +1,7 @@
 package presentation;
 
-import service.CategoryService;
 import service.OrderService;
-import entity.Orders;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class OrderMenu {

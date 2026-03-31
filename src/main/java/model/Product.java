@@ -1,4 +1,6 @@
-package entity;
+package model;
+
+import java.time.LocalDateTime;
 
 public class Product {
     private int id;
@@ -10,6 +12,48 @@ public class Product {
     private int stock;
     private String description;
     private int categoryId;
+    private Double flashSalePrice;
+    private Integer flashSaleQuantity;
+    private LocalDateTime flashSaleExpiry;
+
+    public Double getFlashSalePrice() {
+        return flashSalePrice;
+    }
+
+    public void setFlashSalePrice(Double flashSalePrice) {
+        this.flashSalePrice = flashSalePrice;
+    }
+
+    public Integer getFlashSaleQuantity() {
+        return flashSaleQuantity;
+    }
+
+    public void setFlashSaleQuantity(Integer flashSaleQuantity) {
+        this.flashSaleQuantity = flashSaleQuantity;
+    }
+
+    public LocalDateTime getFlashSaleExpiry() {
+        return flashSaleExpiry;
+    }
+
+    public void setFlashSaleExpiry(LocalDateTime flashSaleExpiry) {
+        this.flashSaleExpiry = flashSaleExpiry;
+    }
+
+    public Product(int id, String name, String brand, String capacity, String color, double price, int stock, String description, int categoryId, Double flashSalePrice, Integer flashSaleQuantity, LocalDateTime flashSaleExpiry) {
+        this.id = id;
+        this.name = name;
+        this.brand = brand;
+        this.capacity = capacity;
+        this.color = color;
+        this.price = price;
+        this.stock = stock;
+        this.description = description;
+        this.categoryId = categoryId;
+        this.flashSalePrice = flashSalePrice;
+        this.flashSaleQuantity = flashSaleQuantity;
+        this.flashSaleExpiry = flashSaleExpiry;
+    }
 
     public int getCategoryId() {
         return categoryId;
@@ -22,16 +66,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(int id, String name, String brand, String capacity, String color, double price, int stock, String description) {
-        this.id = id;
-        this.name = name;
-        this.brand = brand;
-        this.capacity = capacity;
-        this.color = color;
-        this.price = price;
-        this.stock = stock;
-        this.description = description;
-    }
+
 
     public int getId() {
         return id;
@@ -98,6 +133,7 @@ public class Product {
     public void setDescription(String description) {
         this.description = description;
     }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -109,6 +145,10 @@ public class Product {
                 ", price=" + price +
                 ", stock=" + stock +
                 ", description='" + description + '\'' +
+                ", categoryId=" + categoryId +
+                ", flashSalePrice=" + flashSalePrice +
+                ", flashSaleQuantity=" + flashSaleQuantity +
+                ", flashSaleExpiry=" + flashSaleExpiry +
                 '}';
     }
 }

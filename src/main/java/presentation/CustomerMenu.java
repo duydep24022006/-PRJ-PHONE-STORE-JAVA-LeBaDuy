@@ -1,7 +1,9 @@
 package presentation;
 
-import entity.Customer;
+import dao.OrderDAO;
+import model.Customer;
 import service.CustomerService;
+import service.ReportService;
 
 public class CustomerMenu {
     private Customer customer;
@@ -23,6 +25,7 @@ public class CustomerMenu {
             System.out.println("5. Cap nhat thong tin ca nhan");
             System.out.println("6. Loc san pham theo hang");
             System.out.println("7. Loc san pham theo gia");
+            System.out.println("8. danh sanh 5 san pham ban chay nhat thang");
             System.out.println("0. Thoat");
             System.out.print("Chon: ");
             choice = customerService.validateInt();
@@ -33,8 +36,9 @@ public class CustomerMenu {
                 case 3 -> customerService.placeOrder();
                 case 4 -> customerService.viewOrders();
                 case 5 -> customerService.updateProfile();
-                case 6-> customerService.fillterByBrand();
+                case 6 -> customerService.fillterByBrand();
                 case 7 -> customerService.filterByPrice();
+                case 8 -> customerService.topProducts();
                 case 0 -> System.out.println("Thoat menu khach hang.");
                 default -> System.out.println("Lua chon khong hop le!");
             }

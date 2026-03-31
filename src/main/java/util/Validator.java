@@ -4,11 +4,10 @@ import java.util.regex.Pattern;
 
 public class Validator {
     private static final String EMAIL_REGEX =
-            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+            "^[A-Za-z0-9]+([._%+-]?[A-Za-z0-9]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*\\.[A-Za-z]{2,}$";
 
     private static final String PHONE_REGEX =
-            "^\\d{10}$";
-
+            "^(03|05|07|08|09)\\d{8}$";
     public static boolean isValidEmail(String email) {
         return email != null && Pattern.matches(EMAIL_REGEX, email);
     }
@@ -18,7 +17,31 @@ public class Validator {
     }
 
     public static boolean isValidPassword(String password) {
-        if (password == null || password.length() <8) return false;
-        return true;
+        if (password == null || password.length() < 8) return false;
+
+        boolean hasUpper = false;
+        boolean hasLower = false;
+
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUpper = true;
+            if (Character.isLowerCase(c)) hasLower = true;
+
+            // tối ưu: đủ điều kiện thì thoát luôn
+            if (hasUpper && hasLower) return true;
+        }
+
+        return false;
+    }
+    public static String formatMoney(double amount) {
+        long value = Math.round(amount); // loại bỏ .0 và E7
+
+        String num = String.valueOf(value);
+        StringBuilder sb = new StringBuilder(num);
+
+        for (int i = sb.length() - 3; i > 0; i -= 3) {
+            sb.insert(i, ".");
+        }
+
+        return sb.toString();
     }
 }

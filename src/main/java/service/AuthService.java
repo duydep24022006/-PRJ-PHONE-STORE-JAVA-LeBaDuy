@@ -1,7 +1,7 @@
 package service;
 
 import dao.CustomerDAO;
-import entity.Customer;
+import model.Customer;
 import presentation.AdminMenu;
 import presentation.CustomerMenu;
 import util.Validator;
@@ -40,6 +40,13 @@ public class AuthService {
             phone = sc.nextLine();
             if (!Validator.isValidPhone(phone)) {
                 System.out.println("So dien thoai khong hop le, vui long nhap lai!");
+                continue;
+            }
+            final String checkPhone = phone;
+            boolean phoneExists = customerDAO.getAllCustomer().stream()
+                    .anyMatch(c -> c.getPhone().equalsIgnoreCase(checkPhone));
+            if (phoneExists) {
+                System.out.println("So dien thoai da ton tai, vui long nhap lai!");
                 continue;
             }
             break;

@@ -2,15 +2,20 @@ package service;
 
 import dao.CategoryDAO;
 import dao.ProductDAO;
-import entity.Category;
-import entity.Product;
+import model.Category;
+import model.Product;
+import util.Validator;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class ProductService {
     private ProductDAO productDAO = new ProductDAO();
     private Scanner sc = new Scanner(System.in);
+    DecimalFormat df = new DecimalFormat("#,###");
     public void addProduct() {
         System.out.println("=== Them moi san pham ===");
         System.out.print("Ten: ");
@@ -104,7 +109,6 @@ public class ProductService {
         choice = sc.nextLine();
         int categoryId = old.getCategoryId();
         if (choice.equalsIgnoreCase("Y")) {
-            // Hiển thị danh mục để chọn lại
             CategoryDAO categoryDAO = new CategoryDAO();
             List<Category> list = categoryDAO.getAllCategories();
             System.out.printf("%-5s  %-20s %-30s%n", "ID", "Ten", "Mo ta");
@@ -172,13 +176,13 @@ public class ProductService {
         System.out.println("--------------------------------------------------------------------------------");
 
         for (Product p : list) {
-            System.out.printf("%-5d %-20s %-15s %-10s %-10s %-10.2f %-10d%n",
+            System.out.printf("%-5d %-20s %-15s %-10s %-10s %-10s %-10d%n",
                     p.getId(),
                     p.getName(),
                     p.getBrand(),
                     p.getCapacity(),
                     p.getColor(),
-                    p.getPrice(),
+                    Validator.formatMoney(p.getPrice()),
                     p.getCategoryId());
         }
     }
@@ -196,14 +200,15 @@ public class ProductService {
         System.out.println("--------------------------------------------------------------------------------");
 
         for (Product p : list) {
-            System.out.printf("%-5d %-20s %-15s %-10s %-10s %-10.2f %-10d%n",
+            System.out.printf("%-5d %-20s %-15s %-10s %-10s %-10s %-10d%n",
                     p.getId(),
                     p.getName(),
                     p.getBrand(),
                     p.getCapacity(),
                     p.getColor(),
-                    p.getPrice(),
+                    Validator.formatMoney(p.getPrice()),
                     p.getCategoryId());
         }
     }
+
 }
