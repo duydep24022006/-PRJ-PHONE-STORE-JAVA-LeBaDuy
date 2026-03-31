@@ -2,7 +2,6 @@ package service;
 
 import dao.CategoryDAO;
 import model.Category;
-
 import java.util.List;
 import java.util.Scanner;
 

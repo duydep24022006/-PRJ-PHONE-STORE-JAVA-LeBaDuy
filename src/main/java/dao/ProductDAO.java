@@ -102,7 +102,12 @@ public class ProductDAO {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (e.getSQLState().equals("23000")) { // 23000 là SQLState cho lỗi ràng buộc
+                System.out.println("San pham nay dang duoc su dung trong cac don hang hoac lien ket khac, nen khong the xoa.");
+                System.out.println("Vui long xoa cac du lieu lien quan truoc khi xoa san pham.");
+            } else {
+                e.printStackTrace();
+            }
         }
     }
 

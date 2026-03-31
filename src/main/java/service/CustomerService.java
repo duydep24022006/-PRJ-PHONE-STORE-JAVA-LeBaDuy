@@ -186,13 +186,13 @@ public class CustomerService {
             System.out.println("Ban chua co don hang nao!");
             return;
         }
-        System.out.printf("%-5s %-15s %-25s %-20s %-10s %-15s %-15s %-12s %-15s %-20s\n",
-                "ID", "Khach hang", "Email", "San pham", "SL", "Gia (VND)", "Thanh tien", "Ma giam gia", "Tong sau giam", "Ngay tao");
+        System.out.printf("%-5s %-15s %-25s %-20s %-10s %-15s %-15s %-12s %-15s %-20s %12s\n",
+                "ID", "Khach hang", "Email", "San pham", "SL", "Gia (VND)", "Thanh tien", "Ma giam gia", "Tong sau giam", "Ngay tao","Trang thai");
         System.out.println("-------------------------------------------------------------------------------------------------------------------");
 
         for (Orders o : orders) {
             double lineTotal = o.getQuantity() * o.getPrice();
-            System.out.printf("%-5d %-15s %-25s %-20s %-10d %-15s %-15s %-12s %-15s %-20s\n",
+            System.out.printf("%-5d %-15s %-25s %-20s %-10d %-15s %-15s %-12s %-15s %-20s %-12s\n",
                     o.getId(),
                     o.getCustomerName(),
                     o.getCustomerEmail(),
@@ -202,8 +202,8 @@ public class CustomerService {
                     Validator.formatMoney(lineTotal),
                     (o.getCouponCode() == null ? "Khong co" : o.getCouponCode()),
                     Validator.formatMoney(o.getFinalTotal()),
-
-                    o.getCreatedAt());
+                    o.getCreatedAt(),
+                    o.getStatus());
         }
     }
 

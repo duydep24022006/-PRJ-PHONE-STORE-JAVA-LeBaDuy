@@ -47,7 +47,14 @@ public class CategoryDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("23000")) { // lỗi ràng buộc khóa ngoại
+                System.out.println("Danh muc nay dang duoc su dung trong cac don hang hoac lien ket khac, nen khong the xoa.");
+                System.out.println("Vui long xoa cac du lieu lien quan truoc khi xoa san pham.");
+            } else {
+                e.printStackTrace();
+            }
+        }
     }
 
     public List<Category> getAllCategories() {
