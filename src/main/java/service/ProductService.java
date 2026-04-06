@@ -6,14 +6,12 @@ import model.Category;
 import model.Product;
 import util.Validator;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Scanner;
 
 public class ProductService {
     private ProductDAO productDAO = new ProductDAO();
     private Scanner sc = new Scanner(System.in);
-    DecimalFormat df = new DecimalFormat("#,###");
     public void addProduct() {
         System.out.println("=== Them moi san pham ===");
         System.out.print("Ten: ");

@@ -5,7 +5,9 @@ import util.DBConnection;
 import java.sql.SQLException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrderDAO {
     private Connection conn ;
@@ -18,12 +20,12 @@ public class OrderDAO {
     }
     public List<Orders> getAllOrders() {
         List<Orders> list = new ArrayList<>();
-        String sql = "SELECT o.id AS order_id, o.customer_id, c.name AS customer_name, c.email AS customer_email, " +
-                "o.status, o.created_at, p.name AS product_name, od.quantity, od.price " +
-                "FROM orders o " +
-                "JOIN customer c ON o.customer_id = c.id " +
-                "JOIN order_details od ON o.id = od.order_id " +
-                "JOIN product p ON od.product_id = p.id";
+        String sql = "select o.id as order_id, o.customer_id, c.name as customer_name, c.email as customer_email, " +
+                "o.status, o.created_at, p.name as product_name, od.quantity, od.price " +
+                "from orders o " +
+                "join customer c on o.customer_id = c.id " +
+                "join order_details od on o.id = od.order_id " +
+                "join product p on od.product_id = p.id";
 
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -96,10 +98,10 @@ public class OrderDAO {
         }
     }
     public int createOrder(int customer_id, int productId, int quantity) {
-        String insertOrderSQL = "INSERT INTO orders(customer_id, status) VALUES(?,'pending')";
-        String insertDetailSQL = "INSERT INTO order_details(order_id, product_id, quantity, price) VALUES (?,?,?,?)";
-        String updateStockSQL = "UPDATE product SET stock = stock - ? WHERE id = ?";
-        String productSQL = "SELECT price, flash_sale_price, flash_sale_quantity, flash_sale_expiry FROM product WHERE id=?";
+        String insertOrderSQL = "insert into orders(customer_id, status) values(?,'pending')";
+        String insertDetailSQL =  "insert into order_details(order_id, product_id, quantity, price) values (?,?,?,?)";
+        String updateStockSQL =  "update product set stock = stock - ? where id = ?";
+        String productSQL = "select price, flash_sale_price, flash_sale_quantity, flash_sale_expiry from product where id=?";
         int orderId = -1;
 
         try {
@@ -147,7 +149,7 @@ public class OrderDAO {
 
             // 4. Giảm stock hoặc flash_sale_quantity
             if (flashSaleUsed) {
-                String updateFlashSaleSQL = "UPDATE product SET flash_sale_quantity = flash_sale_quantity - ? WHERE id = ?";
+                String updateFlashSaleSQL = "update product set flash_sale_quantity = flash_sale_quantity - ? where id = ?";
                 try (PreparedStatement ps = conn.prepareStatement(updateFlashSaleSQL)) {
                     ps.setInt(1, quantity);
                     ps.setInt(2, productId);
@@ -174,9 +176,9 @@ public class OrderDAO {
 
 
     public void cancelOrder(int orderId) {
-        String sqlDetails = "SELECT product_id, quantity FROM order_details WHERE order_id = ?";
-        String sqlUpdateStock = "UPDATE product SET stock = stock + ? WHERE id = ?";
-        String sqlUpdateOrder = "UPDATE orders SET status = 'cancelled' WHERE id = ?";
+        String sqlDetails = "select product_id, quantity from order_details where order_id = ?";
+        String sqlUpdateStock = "update product set stock = stock + ? where id = ?";
+        String sqlUpdateOrder ="update orders set status = 'cancelled' where id = ?";
 
         try {
             conn.setAutoCommit(false);
@@ -215,17 +217,17 @@ public class OrderDAO {
     }
     public List<Orders> getOrdersByCustomer(int customerId) {
         List<Orders> list = new ArrayList<>();
-        String sql = "SELECT o.id AS order_id, " +
-                "c.name AS customer_name, c.email AS customer_email, " +
-                "p.name AS product_name, od.quantity, od.price, " +
-                "o.status, o.created_at, cp.code AS coupon_code, cp.discount_percent, o.final_total " +
-                "FROM orders o " +
-                "JOIN customer c ON o.customer_id = c.id " +
-                "JOIN order_details od ON o.id = od.order_id " +
-                "JOIN product p ON od.product_id = p.id " +
-                "LEFT JOIN order_coupon oc ON o.id = oc.order_id " +
-                "LEFT JOIN coupon cp ON oc.coupon_id = cp.id " +
-                "WHERE o.customer_id = ?";
+        String sql = "select o.id as order_id, " +
+                        "c.name as customer_name, c.email as customer_email, " +
+                        "p.name as product_name, od.quantity, od.price, " +
+                        "o.status, o.created_at, cp.code as coupon_code, cp.discount_percent, o.final_total " +
+                        "from orders o " +
+                        "join customer c on o.customer_id = c.id " +
+                        "join order_details od on o.id = od.order_id " +
+                        "join product p on od.product_id = p.id " +
+                        "left join order_coupon oc on o.id = oc.order_id " +
+                        "left join coupon cp on oc.coupon_id = cp.id " +
+                        "where o.customer_id = ?";
 
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -253,7 +255,7 @@ public class OrderDAO {
     }
 
     private double getOrderTotal(int orderId) {
-        String sql = "SELECT SUM(quantity * price) AS total FROM order_details WHERE order_id = ?";
+        String sql = "select sum(quantity * price) as total from order_details where order_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();
@@ -280,8 +282,8 @@ public class OrderDAO {
 
         try {
             // 1. Lưu coupon vào order_coupon
-            String sql = "INSERT INTO order_coupon (order_id, coupon_id) " +
-                    "SELECT ?, id FROM coupon WHERE code = ?";
+            String sql = "insert into order_coupon (order_id, coupon_id) " +
+                    "select ?, id from coupon where code = ?";
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, orderId);
                 ps.setString(2, code);
@@ -289,7 +291,7 @@ public class OrderDAO {
             }
 
             // 2. Update final_total vào orders
-            String updateOrder = "UPDATE orders SET final_total = ? WHERE id = ?";
+            String updateOrder ="update orders set final_total = ? where id = ?";
             try (PreparedStatement ps = conn.prepareStatement(updateOrder)) {
                 ps.setDouble(1, finalAmount);
                 ps.setInt(2, orderId);
@@ -307,15 +309,14 @@ public class OrderDAO {
         return finalAmount;
     }
     public void reportTop5ProductsThisMonth() {
-        String sql = "SELECT p.name AS product_name, SUM(od.quantity) AS total_sold " +
-                "FROM order_details od " +
-                "JOIN product p ON od.product_id = p.id " +
-                "JOIN orders o ON od.order_id = o.id " +
-                "WHERE MONTH(o.created_at) = MONTH(CURDATE()) " +
-                "AND YEAR(o.created_at) = YEAR(CURDATE()) " +
-                "GROUP BY p.id, p.name " +
-                "ORDER BY total_sold DESC LIMIT 5";
-
+        String sql = "select p.name as product_name, sum(od.quantity) as total_sold " +
+                    "from order_details od " +
+                    "join product p on od.product_id = p.id " +
+                    "join orders o on od.order_id = o.id " +
+                    "where month(o.created_at) = month(curdate()) " +
+                    "and year(o.created_at) = year(curdate()) " +
+                    "group by p.id, p.name " +
+                    "order by total_sold desc limit 5";
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             System.out.println("=== Top 5 san pham ban chay nhat thang ===");
@@ -331,7 +332,7 @@ public class OrderDAO {
         }
     }
     public int createOrder(int customerId) throws SQLException {
-        String insertOrderSQL = "INSERT INTO orders(customer_id, status) VALUES(?,'pending')";
+        String insertOrderSQL = "insert into orders(customer_id, status) values(?,'pending')";
         int orderId = -1;
         try (PreparedStatement ps = conn.prepareStatement(insertOrderSQL, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, customerId);
@@ -344,7 +345,7 @@ public class OrderDAO {
         return orderId;
     }
     public void addOrderItem(int orderId, int productId, int quantity, double price) throws SQLException {
-        String insertDetailSQL = "INSERT INTO order_details(order_id, product_id, quantity, price) VALUES (?,?,?,?)";
+        String insertDetailSQL =  "insert into order_details(order_id, product_id, quantity, price) values (?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(insertDetailSQL)) {
             ps.setInt(1, orderId);
             ps.setInt(2, productId);
@@ -354,12 +355,31 @@ public class OrderDAO {
         }
 
         // Giảm stock
-        String updateStockSQL = "UPDATE product SET stock = stock - ? WHERE id = ?";
+        String updateStockSQL = "update product set stock = stock - ? where id = ?";
         try (PreparedStatement ps = conn.prepareStatement(updateStockSQL)) {
             ps.setInt(1, quantity);
             ps.setInt(2, productId);
             ps.executeUpdate();
         }
+
+    }
+    public List<Map<String,Object>> getOrderItems(int orderId) throws SQLException {
+        List<Map<String,Object>> items = new ArrayList<>();
+        String sql = "SELECT p.name, od.quantity, od.price " +
+                "FROM order_details od JOIN product p ON od.product_id = p.id " +
+                "WHERE od.order_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String,Object> item = new HashMap<>();
+                item.put("productName", rs.getString("name"));
+                item.put("quantity", rs.getInt("quantity"));
+                item.put("price", rs.getDouble("price"));
+                items.add(item);
+            }
+        }
+        return items;
     }
 
 }

@@ -30,7 +30,7 @@ public class CustomerMenu {
             System.out.println("10. Xem gio hang");
             System.out.println("11. Xoa san pham trong gio hang");
             System.out.println("12. Xoa toan bo gio hang");
-            System.out.println("13. Dat hàng trong gio hang");
+            System.out.println("13. Dat hang trong gio hang");
             System.out.println("0. Thoat");
             System.out.print("Chon: ");
             choice = customerService.validateInt();

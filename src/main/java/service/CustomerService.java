@@ -6,12 +6,9 @@ import dao.OrderDAO;
 import dao.ProductDAO;
 import model.*;
 import util.Validator;
-
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class CustomerService {
     private Customer customer;
@@ -175,31 +172,46 @@ public class CustomerService {
     public void viewOrders() {
         System.out.println("=== Lich su don hang ===");
         List<Orders> orders = orderDAO.getOrdersByCustomer(customer.getId());
-        orders.sort((o1, o2) -> o1.getCreatedAt().compareTo(o2.getCreatedAt()));
         if (orders.isEmpty()) {
             System.out.println("Ban chua co don hang nao!");
             return;
         }
-        System.out.printf("%-5s %-15s %-25s %-20s %-10s %-15s %-15s %-12s %-15s %-20s %12s\n",
-                "ID", "Khach hang", "Email", "San pham", "SL", "Gia (VND)", "Thanh tien", "Ma giam gia", "Tong sau giam", "Ngay tao","Trang thai");
-        System.out.println("-------------------------------------------------------------------------------------------------------------------");
 
+        Map<Integer, List<Orders>> grouped = new LinkedHashMap<>();
         for (Orders o : orders) {
-            double lineTotal = o.getQuantity() * o.getPrice();
-            System.out.printf("%-5d %-15s %-25s %-20s %-10d %-15s %-15s %-12s %-15s %-20s %-12s\n",
-                    o.getId(),
-                    o.getCustomerName(),
-                    o.getCustomerEmail(),
-                    o.getProductName(),
-                    o.getQuantity(),
-                    Validator.formatMoney(o.getPrice()),
-                    Validator.formatMoney(lineTotal),
-                    (o.getCouponCode() == null ? "Khong co" : o.getCouponCode()),
-                    Validator.formatMoney(o.getFinalTotal()),
-                    o.getCreatedAt(),
-                    o.getStatus());
+            grouped.computeIfAbsent(o.getId(), k -> new ArrayList<>()).add(o);
+        }
+
+        // In ra
+        for (Map.Entry<Integer, List<Orders>> entry : grouped.entrySet()) {
+            List<Orders> orderItems = entry.getValue();
+            Orders first = orderItems.get(0);
+
+            System.out.println("Don hang #" + first.getId() +
+                    " - Ngay tao: " + first.getCreatedAt() +
+                    " - Trang thai: " + first.getStatus());
+            System.out.println("Khach hang: " + first.getCustomerName() +
+                    " - Email: " + first.getCustomerEmail());
+            System.out.printf("%-20s %-10s %-15s %-15s%n",
+                    "San pham", "SL", "Gia (VND)", "Thanh tien");
+            System.out.println("--------------------------------------------------------------");
+
+            for (Orders item : orderItems) {
+                double lineTotal = item.getPrice() * item.getQuantity();
+                System.out.printf("%-20s %-10d %-15s %-15s%n",
+                        item.getProductName(),
+                        item.getQuantity(),
+                        Validator.formatMoney(item.getPrice()),
+                        Validator.formatMoney(lineTotal));
+            }
+
+            System.out.println("--------------------------------------------------------------");
+            System.out.println("Ma giam gia: " + (first.getCouponCode() == null ? "Khong co" : first.getCouponCode()));
+            System.out.println("Tong sau giam: " + Validator.formatMoney(first.getFinalTotal()));
+            System.out.println();
         }
     }
+
 
     public void displayProducts(List<Product> products) {
         System.out.printf("%-5s %-25s %-15s %-12s %-12s %-10s\n",
@@ -260,6 +272,7 @@ public class CustomerService {
     }
     public void addToCart(){
         try {
+            viewProducts();
             System.out.print("Nhap ID san pham muon mua: ");
             int id = validateInt();
 

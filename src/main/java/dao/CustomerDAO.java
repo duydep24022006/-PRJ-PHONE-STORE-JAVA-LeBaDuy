@@ -60,7 +60,7 @@ public class CustomerDAO {
     }
 
     public Customer login(String email, String password) {
-        String sql = "SELECT * FROM customer WHERE email=?";
+        String sql = "select * from customer where email=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
@@ -115,7 +115,7 @@ public class CustomerDAO {
     }
     public Customer getByEmailAndPassword(String email, String password) {
         Customer customer = null;
-        String sql = "SELECT * FROM customer WHERE email = ? AND password = ?";
+        String sql = "select * from customer where email = ? and password = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setString(2, password);

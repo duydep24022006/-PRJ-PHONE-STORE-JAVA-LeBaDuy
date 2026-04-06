@@ -18,7 +18,7 @@ public class CartDAO {
         }
     }
     public int createCart(int customerId) throws SQLException {
-        String sql = "INSERT INTO cart (customer_id) VALUES (?)";
+        String sql = "insert into cart (customer_id) values (?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, customerId);
             ps.executeUpdate();
@@ -29,7 +29,7 @@ public class CartDAO {
     }
 
     public void addItem(int cartId, int productId, int quantity) throws SQLException {
-        String sql = "INSERT INTO cart_item (cart_id, product_id, quantity) VALUES (?, ?, ?)";
+        String sql = "insert into cart_item (cart_id, product_id, quantity) values (?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, cartId);
             ps.setInt(2, productId);
@@ -41,7 +41,7 @@ public class CartDAO {
 
     public List<CartItem> getItems(int cartId) throws SQLException {
         List<CartItem> items = new ArrayList<>();
-        String sql = "SELECT p.*, ci.quantity FROM cart_item ci JOIN product p ON ci.product_id=p.id WHERE ci.cart_id=?";
+        String sql = "select p.*, ci.quantity from cart_item ci join product p on ci.product_id=p.id where ci.cart_id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, cartId);
             ResultSet rs = ps.executeQuery();
@@ -58,7 +58,7 @@ public class CartDAO {
         return items;
     }
     public void removeItem(int cartId, int productId) throws SQLException {
-        String sql = "DELETE FROM cart_item WHERE cart_id=? AND product_id=?";
+        String sql = "delete from cart_item where cart_id=? and product_id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, cartId);
             ps.setInt(2, productId);
@@ -73,11 +73,10 @@ public class CartDAO {
 
     // xoa toan bo gio hang
     public void clearCart(int cartId) throws SQLException {
-        String sql = "DELETE FROM cart_item WHERE cart_id=?";
+        String sql = "delete from cart_item where cart_id=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, cartId);
             ps.executeUpdate();
-
         }
     }
 }

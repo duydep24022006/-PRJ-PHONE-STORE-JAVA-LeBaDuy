@@ -2,14 +2,12 @@ package dao;
 
 import model.Coupon;
 import util.DBConnection;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CouponDAO {
     private Connection conn;
-
     public CouponDAO() {
         try {
             conn = DBConnection.getInstance().getConnection();
@@ -20,7 +18,7 @@ public class CouponDAO {
 
     public List<Coupon> getAllCoupons() {
         List<Coupon> list = new ArrayList<>();
-        String sql = "SELECT * FROM coupon";
+        String sql = "select * from coupon";
         try (Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
@@ -41,8 +39,9 @@ public class CouponDAO {
         c.setUsedCount(rs.getInt("used_count"));
         return c;
     }
+
     public void addCoupon(Coupon coupon){
-        String sql ="INSERT INTO coupon(code, discount_percent, expiry_date, usage_limit, used_count) VALUES (?,?,?,?,?)";
+        String sql ="insert into coupon(code, discount_percent, expiry_date, usage_limit, used_count) values (?,?,?,?,?)";
         try(PreparedStatement ps=conn.prepareStatement(sql)){
             ps.setString(1, coupon.getCode());
             ps.setInt(2, coupon.getDiscountPercent());
@@ -55,7 +54,7 @@ public class CouponDAO {
         }
     }
     public Coupon searchByCode(String code) {
-        String sql = "SELECT * FROM coupon WHERE code = ?";
+        String sql = "select * from coupon where code = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, code);
             ResultSet rs = ps.executeQuery();
@@ -68,7 +67,7 @@ public class CouponDAO {
         return null;
     }
     public void updateUsage(String code) {
-        String sql = "UPDATE coupon SET used_count = used_count + 1 WHERE code = ?";
+        String sql = "update coupon set used_count = used_count + 1 where code = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, code);
             ps.executeUpdate();
@@ -77,7 +76,7 @@ public class CouponDAO {
         }
     }
     public void deleteCoupon(int id) {
-        String sql = "DELETE FROM coupon WHERE id = ?";
+        String sql = "delete from coupon where id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
@@ -86,7 +85,7 @@ public class CouponDAO {
         }
     }
     public boolean isValidCoupon(String code) {
-        String sql = "SELECT * FROM coupon WHERE code = ?";
+        String sql = "select * from coupon where code = ?";
         try(PreparedStatement sp=conn.prepareStatement(sql)){
             sp.setString(1, code);
             ResultSet rs=sp.executeQuery();
@@ -110,7 +109,7 @@ public class CouponDAO {
         return false;
     }
     public int getDiscountPercent(String code) {
-        String sql = "SELECT discount_percent FROM coupon WHERE code = ?";
+        String sql = "select discount_percent from coupon where code = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, code);
             ResultSet rs = ps.executeQuery();
@@ -123,7 +122,7 @@ public class CouponDAO {
         return 0;
     }
     public void incrementUsage(String code) {
-        String sql = "UPDATE coupon SET used_count = used_count + 1 WHERE code = ?";
+        String sql = "update coupon set used_count = used_count + 1 where code = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, code);
             ps.executeUpdate();

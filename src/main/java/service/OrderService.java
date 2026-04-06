@@ -12,7 +12,6 @@ import java.util.Scanner;
 public class OrderService {
     private Customer customer;
     private Scanner sc = new Scanner(System.in);
-    private ProductDAO productDAO = new ProductDAO();
     private OrderDAO orderDAO = new OrderDAO();
 
     public void setCustomer(Customer customer) {
